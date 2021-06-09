@@ -45,10 +45,13 @@ func NewContestDefault() *Contest {
 type Contest struct {
 	gorm.Model
 
+	// 创建者
 	UserID  uint
+
 	BeginAt time.Time
 	EndAt   time.Time
 
+	// 标题和描述
 	Tittle      string
 	Description string
 

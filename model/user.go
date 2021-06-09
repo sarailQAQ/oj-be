@@ -14,14 +14,20 @@ import (
 )
 
 var (
-	InvalidUser     = errors.New("invalid user")
-	UsernameExit    = errors.New("username exit")
-	MailUsed        = errors.New("mail has been used")
-	PhoneNumberUsed = errors.New("phone number has been used")
+	ErrInvalidUser     = errors.New("invalid user")
+	ErrUsernameExit    = errors.New("username exit")
+	ErrMailUsed        = errors.New("mail has been used")
+	ErrPhoneNumberUsed = errors.New("phone number has been used")
 )
 
 func NewUser() *User {
 	return &User{}
+}
+
+func NewUserWithID(id uint) *User {
+	return &User{
+		Model: Model{ID: id},
+	}
 }
 
 type User struct {
@@ -44,37 +50,37 @@ func (u *User) AutoMigrate(tx *gorm.DB) {
 }
 
 func (u *User) Invalid() bool {
-	return u.Username == "" && u.Mail == "" && u.PhoneNumber == ""
+	return u.ID == 0 && u.Username == "" && u.Mail == "" && u.PhoneNumber == ""
 }
 
 // BeforeCreate 判断是否合法
 func (u *User) BeforeCreate(tx *gorm.DB) error {
 	if u.Invalid() {
-		return InvalidUser
+		return ErrInvalidUser
 	}
 
 	// team前缀用作比赛账号
 	if strings.HasPrefix(u.Username, "team") {
-		return InvalidUser
+		return ErrInvalidUser
 	}
 
 	txUser, cnt := tx.Model(NewUser()), int64(0)
 	if len(u.Username) > 0 {
 		txUser.Where("username=?", u.Username).Count(&cnt)
 		if cnt > 0 {
-			return UsernameExit
+			return ErrUsernameExit
 		}
 	}
 	if len(u.PhoneNumber) > 0 {
 		txUser.Where("phone_number=?", u.PhoneNumber).Count(&cnt)
 		if cnt > 0 {
-			return PhoneNumberUsed
+			return ErrPhoneNumberUsed
 		}
 	}
 	if len(u.Mail) > 0 {
 		txUser.Where("mail=?", u.Mail).Count(&cnt)
 		if cnt > 0 {
-			return MailUsed
+			return ErrMailUsed
 		}
 	}
 
@@ -82,7 +88,7 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 }
 
 
-// Login Username OR Mail OR PhoneNumber AND Password needed
+// Login Username OR Mail OR PhoneNumber AND Password required
 func (u *User) Login(tx *gorm.DB) (ok bool){
 	if  u.Invalid() {
 		return false
@@ -92,9 +98,16 @@ func (u *User) Login(tx *gorm.DB) (ok bool){
 	return u.ID > 0
 }
 
-// Register Username And Mail OR PhoneNumber AND Password needed
+// Register Username And Mail OR PhoneNumber AND Password required
 func (u *User) Register(tx *gorm.DB) (err error) {
 	return tx.Create(u).Error
+}
+
+// Exist ID OR Username OR Mail OR PhoneNumber required
+func (u *User) Exist(tx *gorm.DB) bool {
+	cnt := int64(0)
+	tx.Model(NewUser()).Where(u).Count(&cnt)
+	return cnt > 0
 }
 
 
