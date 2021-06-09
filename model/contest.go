@@ -54,7 +54,7 @@ type Contest struct {
 
 	Type uint8
 
-	Problems []Problem `gorm:""`
+	Problems []ContestProblem `gorm:"foreignKey:ProblemID"`
 }
 
 func (c *Contest) AutoMigrate(tx *gorm.DB) {

@@ -31,7 +31,7 @@ func NewProblem() *Problem {
 }
 
 type Problem struct {
-	model
+	Model
 
 	UserID uint
 

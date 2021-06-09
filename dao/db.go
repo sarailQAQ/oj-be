@@ -12,4 +12,6 @@ func NewTX() *gorm.DB {
 	return db.Begin()
 }
 
-
+func OriginDB() *gorm.DB {
+	return db
+}

@@ -14,12 +14,12 @@ import (
 
 type DeletedAt sql.NullTime
 
-// model 重新定义的model，为id添加了索引
-type model struct {
-	ID        uint `gorm:"primaryKey;index:model"`
+// Model 重新定义的model，为id添加了索引
+type Model struct {
+	ID        uint `gorm:"primaryKey;index:idx_model"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt DeletedAt `gorm:"index:deleted_at"`
+	DeletedAt gorm.DeletedAt `gorm:"index:idx_deleted_at"`
 }
 
 // Init 显示调用
