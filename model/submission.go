@@ -8,7 +8,12 @@ package model
 
 import (
 	"gorm.io/gorm"
+	"log"
 )
+
+func NewSubmission() *Submission {
+	return &Submission{}
+}
 
 type Submission struct {
 	gorm.Model
@@ -20,4 +25,11 @@ type Submission struct {
 	Language    string
 	Code        string
 	SubmittedAt int64 `gorm:"index:sub_problem,priority:2;index:sub_user,priority:2"`
+}
+
+func (sub *Submission) AutoMigrate(tx *gorm.DB) {
+	err := tx.AutoMigrate(&sub)
+	if err != nil {
+		log.Panicln(err)
+	}
 }

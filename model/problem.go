@@ -6,6 +6,11 @@
 
 package model
 
+import (
+	"gorm.io/gorm"
+	"log"
+)
+
 // 问题的状态常量
 const (
 	// 正常状态，所有用户都可见
@@ -21,6 +26,10 @@ const (
 	problemInContest = 4
 )
 
+func NewProblem() *Problem {
+	return &Problem{}
+}
+
 type Problem struct {
 	model
 
@@ -35,4 +44,11 @@ type Problem struct {
 	InputDescription  string
 	OutputDescription string
 	Tip               string
+}
+
+func (p *Problem) AutoMigrate(tx *gorm.DB) {
+	err := tx.AutoMigrate(&p)
+	if err != nil {
+		log.Panicln(err)
+	}
 }

@@ -8,6 +8,7 @@ package model
 
 import (
 	"database/sql"
+	"gorm.io/gorm"
 	"time"
 )
 
@@ -19,4 +20,13 @@ type model struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt DeletedAt `gorm:"index:deleted_at"`
+}
+
+// Init 显示调用
+func Init(db *gorm.DB) {
+	NewUser().AutoMigrate(db)
+	NewContestProblem().AutoMigrate(db)
+	NewContest().AutoMigrate(db)
+	NewProblem().AutoMigrate(db)
+	NewSubmission().AutoMigrate(db)
 }

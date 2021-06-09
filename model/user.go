@@ -6,6 +6,14 @@
 
 package model
 
+import (
+	"gorm.io/gorm"
+	"log"
+)
+
+func NewUser() *User {
+	return &User{}
+}
 type User struct {
 	model
 
@@ -17,3 +25,12 @@ type User struct {
 	Sex      int8
 	Avatar   string
 }
+
+func (u *User) AutoMigrate(tx *gorm.DB) {
+	err := tx.AutoMigrate(&u)
+	if err != nil {
+		log.Panicln(err)
+	}
+}
+
+

@@ -14,7 +14,7 @@ var db *gorm.DB
 
 func init() {
 	dsn := "root:123456@tcp(127.0.0.1:3306)/oj?charset=utf8mb4&parseTime=True&loc=Local"
-	mysql, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
+	sqlDB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		PrepareStmt: true,
 	})
 
@@ -22,5 +22,5 @@ func init() {
 		println(err)
 	}
 
-	db = mysql
+	db = sqlDB
 }
