@@ -22,13 +22,13 @@ func NewSubmission() *Submission {
 type Submission struct {
 	gorm.Model
 
-	ProblemID uint `gorm:"type:not null;index:sub_problem,priority:1"`
-	UserID    uint `gorm:"type:not null;index:sub_user,priority:1"`
+	ProblemID uint `gorm:"not null;index:sub_problem,priority:1"`
+	UserID    uint `gorm:"not null;index:sub_user,priority:1"`
 
-	TimeUsed    float32 `gorm:"type:not null"`
+	TimeUsed    float32 `gorm:"not null"`
 	Language    string  `gorm:"type:varchar(10) not null"`
-	Code        string  `gorm:"type:not null"`
-	SubmittedAt int64   `gorm:"index:sub_problem,priority:2;index:sub_user,priority:2"`
+	Code        string  `gorm:"not null"`
+	SubmittedAt int64   `gorm:"not null;index:sub_problem,priority:2;index:sub_user,priority:2"`
 }
 
 func (sub *Submission) AutoMigrate(tx *gorm.DB) {

@@ -43,7 +43,8 @@ func NewProblemWithID(id uint) *Problem {
 type Problem struct {
 	Model
 
-	UserID uint
+	// UserID 上传题目的用户的ID
+	UserID    uint
 
 	// status: 题目的状态
 	Status uint8

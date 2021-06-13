@@ -53,8 +53,7 @@ func (u *User) Invalid() bool {
 	return u.ID == 0 && u.Username == "" && u.Mail == "" && u.PhoneNumber == ""
 }
 
-// BeforeCreate 判断是否合法
-func (u *User) BeforeCreate(tx *gorm.DB) error {
+func (u *User) check(tx *gorm.DB) error {
 	if u.Invalid() {
 		return ErrInvalidUser
 	}
@@ -87,9 +86,13 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 	return nil
 }
 
+// BeforeCreate 判断是否合法
+func (u *User) BeforeCreate(tx *gorm.DB) error {
+	return u.check(tx)
+}
 
 // Login Username OR Mail OR PhoneNumber AND Password required
-func (u *User) Login(tx *gorm.DB) (ok bool){
+func (u *User) Login(tx *gorm.DB) bool {
 	if  u.Invalid() {
 		return false
 	}
@@ -99,7 +102,7 @@ func (u *User) Login(tx *gorm.DB) (ok bool){
 }
 
 // Register Username And Mail OR PhoneNumber AND Password required
-func (u *User) Register(tx *gorm.DB) (err error) {
+func (u *User) Register(tx *gorm.DB) error {
 	return tx.Create(u).Error
 }
 

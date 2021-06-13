@@ -22,5 +22,5 @@ func init() {
 		println(err)
 	}
 
-	db = sqlDB
+	db = sqlDB.Debug()
 }

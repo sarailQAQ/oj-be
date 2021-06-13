@@ -25,8 +25,10 @@ type Model struct {
 // Init 显示调用
 func Init(db *gorm.DB) {
 	NewUser().AutoMigrate(db)
-	NewContestProblem().AutoMigrate(db)
 	NewContest().AutoMigrate(db)
 	NewProblem().AutoMigrate(db)
 	NewSubmission().AutoMigrate(db)
+
+	//NewContestProblem().AutoMigrate(db)
+	//NewContestParticipant().AutoMigrate(db)
 }
