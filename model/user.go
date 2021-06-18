@@ -1,4 +1,3 @@
-
 /**
  * @author: sarail
  * @time: 2021/6/8 22:07
@@ -36,6 +35,7 @@ type User struct {
 	Username    string `gorm:"index;type:varchar(30)"`
 	Mail        string `gorm:"index;type:varchar(30)"`
 	PhoneNumber string `gorm:"index;type:varchar(30)"`
+	Password    string
 
 	Nickname string
 	Sex      int8
@@ -93,7 +93,7 @@ func (u *User) BeforeCreate(tx *gorm.DB) error {
 
 // Login Username OR Mail OR PhoneNumber AND Password required
 func (u *User) Login(tx *gorm.DB) bool {
-	if  u.Invalid() {
+	if u.Invalid() {
 		return false
 	}
 
@@ -112,5 +112,3 @@ func (u *User) Exist(tx *gorm.DB) bool {
 	tx.Model(NewUser()).Where(u).Count(&cnt)
 	return cnt > 0
 }
-
-

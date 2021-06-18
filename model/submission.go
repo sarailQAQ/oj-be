@@ -15,6 +15,15 @@ var (
 	ErrInvalidSubmission = errors.New("invalid submission")
 )
 
+const (
+	AC  = 1
+	WA  = 2
+	TLE = 3
+	RE  = 4
+	MLE = 5
+	PE  = 6
+)
+
 func NewSubmission() *Submission {
 	return &Submission{}
 }
@@ -29,6 +38,9 @@ type Submission struct {
 	Language    string  `gorm:"type:varchar(10) not null"`
 	Code        string  `gorm:"not null"`
 	SubmittedAt int64   `gorm:"not null;index:sub_problem,priority:2;index:sub_user,priority:2"`
+
+	// 结果
+	Result int
 }
 
 func (sub *Submission) AutoMigrate(tx *gorm.DB) {

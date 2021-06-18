@@ -64,6 +64,7 @@ func (p *Problem) AutoMigrate(tx *gorm.DB) {
 	}
 }
 
+// BeforeCreate Hook interface
 func (p *Problem) BeforeCreate(tx *gorm.DB) error {
 	if p.Status == 0 {
 		p.Status = problemOwnerOnly
@@ -93,7 +94,7 @@ func (p *Problem) Create(tx *gorm.DB) error {
 
 // FindOne ID required
 func (p *Problem) FindOne(tx *gorm.DB) error {
-	return tx.Where("id=?", p.ID).Find(p).Error
+	return tx.Find(p).Error
 }
 
 // Exist ID required
