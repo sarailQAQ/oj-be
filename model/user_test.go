@@ -13,7 +13,7 @@ import (
 
 func TestUserLogin(t *testing.T) {
 	user := NewUser()
-	user.Username = "sarail"
+	user.Username = "Hapwitch"
 	user.Mail = "sarail@qq.com"
 	user.Password = "123456"
 	user.Sex = 1
@@ -27,4 +27,18 @@ func TestUserLogin(t *testing.T) {
 	_ = u.Login(tx)
 	tx.Commit()
 
+}
+
+func TestUser_Register(t *testing.T) {
+	user := NewUser()
+	user.Username = "Hapwitch"
+	user.Mail = "sarail@qq.com"
+	user.Password = "123456"
+	user.Sex = 1
+
+	tx := dao.NewTX()
+	_ = user.Register(tx)
+
+
+	tx.Commit()
 }

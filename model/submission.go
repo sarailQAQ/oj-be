@@ -51,10 +51,10 @@ func (sub *Submission) AutoMigrate(tx *gorm.DB) {
 }
 
 func (sub *Submission) BeforeCreate(tx *gorm.DB) error {
-	if NewProblemWithID(sub.ProblemID).Exist(tx) {
+	if !NewProblemWithID(sub.ProblemID).Exist(tx) {
 		return ErrInvalidSubmission
 	}
-	if NewUserWithID(sub.UserID).Exist(tx) {
+	if !NewUserWithID(sub.UserID).Exist(tx) {
 		return ErrInvalidUser
 	}
 

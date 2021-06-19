@@ -64,8 +64,8 @@ type Contest struct {
 	Type uint8
 
 	// 关联模式
-	Problems     []Problem `gorm:"many2many:contest_problems"`
-	Participants []User    `gorm:"many2many:contest_users"`
+	Problems     []Problem `gorm:"many2many:contest_problems;foreignKey:ID"`
+	Participants []User    `gorm:"many2many:contest_users;foreignKey:ID"`
 }
 
 func (c *Contest) AutoMigrate(tx *gorm.DB) {
@@ -76,9 +76,9 @@ func (c *Contest) AutoMigrate(tx *gorm.DB) {
 }
 
 func (c *Contest) BeforeCreate(tx *gorm.DB) error {
-	if c.BeginAt.Before(time.Now()) {
-		return ErrInvalidContest
-	}
+	//if c.BeginAt.Before(time.Now()) {
+	//	return ErrInvalidContest
+	//}
 
 	if !NewUserWithID(c.UserID).Exist(tx) {
 		return ErrInvalidContest
@@ -88,7 +88,7 @@ func (c *Contest) BeforeCreate(tx *gorm.DB) error {
 }
 
 func (c *Contest) Create(tx *gorm.DB) error {
-	return tx.Create(c).Error
+	return tx.Save(c).Error
 }
 
 // GetInfo ID required
@@ -97,25 +97,25 @@ func (c *Contest) GetInfo(tx *gorm.DB) error {
 }
 
 func (c *Contest) AddProblem(tx *gorm.DB, problemID uint) error {
-	return tx.Model(c).Association("Problem").Append(&Problem{
+	return tx.Model(c).Association("Problems").Append(&Problem{
 		Model: Model{ID: problemID},
 	})
 }
 
 func (c *Contest) DelProblem(tx *gorm.DB, problemID uint) error {
-	return tx.Model(c).Association("Problem").Delete(&Problem{
+	return tx.Model(c).Association("Problems").Delete(&Problem{
 		Model: Model{ID: problemID},
 	})
 }
 
 func (c *Contest) AddUser(tx *gorm.DB, userID uint) error {
-	return tx.Model(c).Association("User").Append(&User{
+	return tx.Model(c).Association("Participants").Append(&User{
 		Model: Model{ID: userID},
 	})
 }
 
 func (c *Contest) DelUser(tx *gorm.DB, userID uint) error {
-	return tx.Model(c).Association("User").Delete(&User{
+	return tx.Model(c).Association("Participants").Delete(&User{
 		Model: Model{ID: userID},
 	})
 }
@@ -133,7 +133,7 @@ type Rank struct {
 type RankList []Rank
 
 func (rl RankList) Len() int {
-	return rl.Len()
+	return len(rl)
 }
 
 func (rl RankList) Less(i, j int) bool {
@@ -153,13 +153,21 @@ func (c *Contest) RankList(tx *gorm.DB) (rankList RankList, err error) {
 		return nil, ErrInvalidContestQuery
 	}
 
-	submissionModel := tx.Model(&Submission{}).Where("result = ?", AC)
-	scoreQuery := submissionModel.Select("count(*)")
-	penaltyQuery := submissionModel.Select("sum(submitted_at)")
-	for u := range c.Participants {
+	tx.Model(c).Association("Participants").Find(&c.Participants)
+	tx.Model(c).Association("Problems").Find(&c.Problems)
+
+	var problemIds []uint
+	for _, p := range c.Problems {
+		problemIds = append(problemIds, p.ID)
+	}
+	fromSQL := tx.Table("(?) as sub", tx.Model(&Submission{}).Where("?<submitted_at and " +
+		"submitted_at<? and problem_id in (?)", c.BeginAt.Unix(), c.EndAt.Unix(), problemIds))
+
+	for _, u := range c.Participants {
 		var rank Rank
-		err = tx.Select("user_id, (?) as score, (?) as penalty",
-			scoreQuery, penaltyQuery).Where("user_id=?", u).Scan(&rank).Error
+		err = fromSQL.Session(&gorm.Session{}).Where("user_id=? and result=?",
+			u.ID, AC).Select("user_id, (count(*)) as score, (sum(submitted_at)) as penalty",
+			).Scan(&rank).Error
 		if err != nil {
 			return nil, err
 		}

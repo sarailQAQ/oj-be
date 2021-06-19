@@ -24,6 +24,7 @@ func TestProblem_Create(t *testing.T) {
 
 	tx := dao.NewTX()
 	_ = p.Create(tx)
+	tx.Commit()
 }
 
 func TestProblem_FindOne(t *testing.T) {

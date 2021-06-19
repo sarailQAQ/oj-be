@@ -109,6 +109,6 @@ func (u *User) Register(tx *gorm.DB) error {
 // Exist ID OR Username OR Mail OR PhoneNumber required
 func (u *User) Exist(tx *gorm.DB) bool {
 	cnt := int64(0)
-	tx.Model(NewUser()).Where(u).Count(&cnt)
+	tx.Model(u).Where(u).Count(&cnt)
 	return cnt > 0
 }
